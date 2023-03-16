@@ -1,10 +1,3 @@
-%%: 図
-%\begin{figure}[H]
-%	\centering
-%	\includegraphics[width=90mm]{figure/eqc.eps}
-%	\caption{簡易等価回路}
-%	\label{fig:eqc}
-%\end{figure}
 \documentclass[10.5pt,a4j,dvipdfmx,openany]{jsbook}
 \input{header.tex}
 
@@ -21,10 +14,10 @@ Development of space debris orbit estimation techniques\\using inter-satellite n
 \listoffigures
 \clearpage
 \chapter{序論}
-\section{社会的背景}
+\section{これはsection}
 \label{背景}
 %\lettrine[lines=2]%
-\subsection*{第五期科学技術基本計画実現に向けて}
+\subsection*{これはsubsection}
 内閣府が提出した第五期科学技術基本計画\cite{第五期科学技術基本計画}において, 
 仮想空間と現実空間が高度に融合したデータ駆動社会, 所謂Society5.0が提唱された.
 Society5.0では, 
@@ -37,13 +30,30 @@ Society5.0では,
 今後の我が国の国際競争における優位性を確保し, ひいては経済成長の強力な足場となり得る.
 
 翻って, ........
-\subsection*{スペースデブリと宇宙開発}
-現在, スペースデブリの推定個数は.....
+\subsection*{これはsubsection}
+\begin{algorithm}[H]
+  \caption{疑似コードも書けます}
+  \begin{algorithmic}[1]
+  \Function {presoucecode}{$array$}
+      \State $max \gets 0$
+      \ForAll {$element \gets array$}
+          \If {$element > max$}
+              \State $max \gets element$
+          \EndIf
+      \EndFor
+      \State \Return $max$
+  \EndFunction
+
+  \end{algorithmic}
+  \end{algorithm}
 \section{本研究の目的}
 本研究では〜
 \section{本論文の構成}
 本論文ではスペースデブリ監視を目的とした衛星ネットワークを提案し,.....
-
+第2章では, .....の概念を導入する.
+第3章では,.....を示す.
+第4章では, ......を行った結果を示す.
+.....
 
 \begin{thebibliography}{9}
 %参考文献の書式。
@@ -61,25 +71,7 @@ Shokri, Reza, et al. "Membership inference attacks against machine learning mode
 内閣府, 第五期科学技術基本計画, \url{https://www8.cao.go.jp/cstp/kihonkeikaku/5honbun.pdf},平成28年1月22日
 \bibitem{Beyond5G}
 五十嵐大和. ``Beyond5G 推進戦略 6G へのロードマップ.'' IEICE Conferences Archives. The Institute of Electronics, Information and Communication Engineers, 2020. 
-\bibitem{BigTech}
-Bremmer, Ian. "The Technopolar Moment: How Digital Powers Will Reshape the Global Order." Foreign Aff. 100 (2021): 112.
-\bibitem{PRISM}
-宮下紘. "個人情報保護とサイバー・セキュリティ: デジタル時代の双子." 比較法雑誌 49.4 (2016): 81-93.
-\bibitem{GDPRsnowden}
-Coyne, Hallie. "The untold story of Edward Snowden’s impact on the GDPR." The Cyber Defense Review 4.2 (2019): 65-80.
-\bibitem{民主主義と自律分散}
-原田泉. "米中新冷戦期の DX 推進と我が国独自のネットワーキング社会の実現." 危機管理研究 29 (2021): 1-14.
-\bibitem{マルチエージェントシステムの基礎と応用}
-大内 東, 山本雅人, 川村秀憲, "マルチエージェントシステムの基礎と応用 -- 複雑系工学の計算パラダイム --", コロナ社, 2003年
-\bibitem{GDPRの影響}
-野村総合研究所, プライバシーガバナンスの時代 ―法改正とGAFA規制に向けたプライバシー投資のあり方― \url{https://www.nri.com/-/media/Corporate/jp/Files/PDF/knowledge/report/cc/mediaforum/2022/forum338.pdf?la=ja-JP&hash=3C2C0B83004EFDBBC63F4650EE36D6F92B18966C}
-\bibitem{GliaCell}
-Types of Glia, lumen, Biology for Majors II,
-\url{\url{https://courses.lumenlearning.com/wm-biology2/chapter/glial-cells/}}
-\bibitem{GliaAssembly}
-文部科学省, 新学術領域研究「グリアアセンブリによる脳機能発現の制御と病態」,\url{http://square.umin.ac.jp/glialassembl/research/index.html#con02}
 \end{thebibliography}
-
 \end{document}
 
 

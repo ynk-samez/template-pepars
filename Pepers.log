@@ -1,4 +1,4 @@
-This is e-pTeX, Version 3.141592653-p4.0.0-220214-2.6 (utf8.euc) (TeX Live 2022) (preloaded format=platex 2022.11.11)  17 MAR 2023 06:50
+This is e-pTeX, Version 3.141592653-p4.0.0-220214-2.6 (utf8.euc) (TeX Live 2022) (preloaded format=platex 2022.11.11)  17 MAR 2023 07:00
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -450,30 +450,238 @@ Document Style - pseudocode environments for use with the `algorithmicx' style
 Package: algorithm 2009/08/24 v0.1 Document Style `algorithm' - floating environment
 \@float@every@algorithm=\toks36
 \c@algorithm=\count321
-) (/usr/local/texlive/2022/texmf-dist/tex/latex/algorithms/algorithmic.sty
-Package: algorithmic 2009/08/24 v0.1 Document Style `algorithmic'
-\c@ALC@unique=\count322
-\c@ALC@line=\count323
-\c@ALC@rem=\count324
-\c@ALC@depth=\count325
-\ALC@tlm=\skip80
+) (/usr/local/texlive/2022/texmf-dist/tex/latex/wallpaper/wallpaper.sty
+Package: wallpaper 2005/01/18, v1.01 easy wallpaper formatting (MHFW)
+\wpXoffset=\skip80
+\wpYoffset=\skip81
+\tileXoffset=\skip82
+\tileYoffset=\skip83
+\tilewidth=\skip84
+\tileheight=\skip85
+\tileX=\skip86
+\tileY=\skip87
+) (/usr/local/texlive/2022/texmf-dist/tex/latex/jvlisting/jvlisting.sty
+Package: jvlisting 2011/11/17 v0.7 Formatted Program Listings
+\jvl@idt=\count322
+\jvl@tmphyphenchar=\count323
+\jvl@fileinput=\read3
+\listingskipamount=\skip88
+\listingindent=\dimen305
+\prelistingpenalty=\count324
+\listingpenalty=\count325
+\postlistingpenalty=\count326
+))
+LaTeX Font Info:    Font shape `JT1/hmc/m/n' will be
+(Font)              scaled to size 9.24683pt on input line 9.
+LaTeX Font Info:    Font shape `JY1/hmc/m/n' will be
+(Font)              scaled to size 9.24683pt on input line 9.
+(/usr/local/texlive/2022/texmf-dist/tex/latex/l3backend/l3backend-dvipdfmx.def
+File: l3backend-dvipdfmx.def 2022-02-07 L3 backend support: dvipdfmx
+(|extractbb --version)
+\c__kernel_sys_dvipdfmx_version_int=\count327
+\l__color_backend_stack_int=\count328
+\g__color_backend_stack_int=\count329
+\g__graphics_track_int=\count330
+\l__pdf_internal_box=\box81
+\g__pdf_backend_object_int=\count331
+\g__pdf_backend_annotation_int=\count332
+\g__pdf_backend_link_int=\count333
+)
 
-! LaTeX Error: Command \algorithmicindent already defined.
-               Or name \end... illegal, see p.192 of the manual.
+LaTeX Warning: Unused global option(s):
+    [10.5pt].
 
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.51 \newlength{\algorithmicindent}
-                                    
+(./Pepers.aux)
+\openout1 = `Pepers.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Checking defaults for JY1/mc/m/n on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Checking defaults for JT1/mc/m/n on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: subfig package v1.3 is loaded.
+Package caption Info: float package is loaded.
+Package caption Info: listings package is loaded.
+Package caption Info: wrapfig package is loaded.
+Package caption Info: End \AtBeginDocument code.
+\c@lstlisting=\count334
+*geometry* detected driver: dvipdfm
+*geometry* verbose mode - [ preamble ] result:
+* driver: dvipdfm
+* paper: a4paper
+* layout: <same size as paper>
+* layoutoffset:(h,v)=(0.0pt,0.0pt)
+* modes: twoside 
+* h-part:(L,W,R)=(56.9055pt, 483.69687pt, 56.9055pt)
+* v-part:(T,H,B)=(85.35826pt, 702.78308pt, 56.9055pt)
+* \paperwidth=597.50787pt
+* \paperheight=845.04684pt
+* \textwidth=483.69687pt
+* \textheight=702.78308pt
+* \oddsidemargin=-15.36449pt
+* \evensidemargin=-15.36449pt
+* \topmargin=-21.22256pt
+* \headheight=20.0pt
+* \headsep=14.31084pt
+* \topskip=12.76073pt
+* \footskip=0.0pt
+* \marginparwidth=120.20934pt
+* \marginparsep=18.49374pt
+* \columnsep=18.49374pt
+* \skip\footins=16.0pt plus 5.0pt minus 2.0pt
+* \hoffset=0.0pt
+* \voffset=0.0pt
+* \mag=1000
+* \@twocolumnfalse
+* \@twosidetrue
+* \@mparswitchtrue
+* \@reversemarginfalse
+* (1in=72.27pt=25.4mm, 1cm=28.453pt)
+
+(/usr/local/texlive/2022/texmf-dist/tex/latex/pdflscape/pdflscape.sty
+Package: pdflscape 2019/12/05 v0.12 Display of landscape pages in PDF (HO)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/base/atbegshi-ltx.sty
+Package: atbegshi-ltx 2021/01/10 v1.0c Emulation of the original atbegshi
+package with kernel methods
+))
+LaTeX Font Info:    Font shape `JT1/hmc/m/n' will be
+(Font)              scaled to size 15.9785pt on input line 10.
+LaTeX Font Info:    Font shape `JY1/hmc/m/n' will be
+(Font)              scaled to size 15.9785pt on input line 10.
+LaTeX Font Info:    Font shape `JT1/hmc/m/n' will be
+(Font)              scaled to size 11.09619pt on input line 10.
+LaTeX Font Info:    Font shape `JY1/hmc/m/n' will be
+(Font)              scaled to size 11.09619pt on input line 10.
+LaTeX Font Info:    Font shape `JY1/hmc/m/n' will be
+(Font)              scaled to size 7.39746pt on input line 10.
+LaTeX Font Info:    Font shape `JY1/hmc/m/n' will be
+(Font)              scaled to size 5.5481pt on input line 10.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 10.
+(/usr/local/texlive/2022/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Trying to load font information for U+msb on input line 10.
+(/usr/local/texlive/2022/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
+LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
+(Font)              scaled to size 11.53198pt on input line 10.
+LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
+(Font)              scaled to size 7.68799pt on input line 10.
+LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
+(Font)              scaled to size 5.76599pt on input line 10.
+[1
+
+
+]
+LaTeX Font Info:    Font shape `JT1/hmc/bx/n' will be
+(Font)              scaled to size 9.24683pt on input line 12.
+LaTeX Font Info:    Font shape `JY1/hmc/bx/n' will be
+(Font)              scaled to size 9.24683pt on input line 12.
+LaTeX Font Info:    Font shape `JT1/hmc/bx/n' will be
+(Font)              scaled to size 15.9785pt on input line 12.
+LaTeX Font Info:    Font shape `JY1/hmc/bx/n' will be
+(Font)              scaled to size 15.9785pt on input line 12.
+
+Underfull \vbox (badness 10000) detected at line 12
+ []
+
+(./Pepers.toc
+LaTeX Font Info:    Font shape `JY1/hmc/m/n' will be
+(Font)              scaled to size 6.47278pt on input line 2.
+LaTeX Font Info:    Font shape `JY1/hmc/m/n' will be
+(Font)              scaled to size 4.62341pt on input line 2.
+LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
+(Font)              scaled to size 9.60999pt on input line 2.
+LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
+(Font)              scaled to size 6.72699pt on input line 2.
+LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
+(Font)              scaled to size 4.805pt on input line 2.
+)
+\tf@toc=\write4
+\openout4 = `Pepers.toc'.
+
+[2
+
+]
+Underfull \vbox (badness 10000) detected at line 13
+ []
+
+(./Pepers.lot)
+\tf@lot=\write5
+\openout5 = `Pepers.lot'.
+
+[3
+
+]
+Underfull \vbox (badness 10000) detected at line 14
+ []
+
+(./Pepers.lof)
+\tf@lof=\write6
+\openout6 = `Pepers.lof'.
+
+[4
+
+]
+第1章
+LaTeX Font Info:    Font shape `JT1/hmc/bx/n' will be
+(Font)              scaled to size 11.09619pt on input line 16.
+LaTeX Font Info:    Font shape `JY1/hmc/bx/n' will be
+(Font)              scaled to size 11.09619pt on input line 16.
+
+Underfull \vbox (badness 10000) detected at line 16
+ []
+
+LaTeX Font Info:    Font shape `JT1/hmc/m/n' will be
+(Font)              scaled to size 13.31541pt on input line 17.
+LaTeX Font Info:    Font shape `JY1/hmc/m/n' will be
+(Font)              scaled to size 13.31541pt on input line 17.
+LaTeX Font Info:    Font shape `JT1/hmc/bx/n' will be
+(Font)              scaled to size 13.31541pt on input line 17.
+LaTeX Font Info:    Font shape `JY1/hmc/bx/n' will be
+(Font)              scaled to size 13.31541pt on input line 17.
+LaTeX Font Info:    Font shape `JT1/hmc/m/n' will be
+(Font)              scaled to size 6.47278pt on input line 21.
+LaTeX Font Info:    Font shape `JT1/hmc/m/n' will be
+(Font)              scaled to size 7.39746pt on input line 37.
+LaTeX Font Info:    Kanji font shape `JY1/hmc/m/sc' undefined
+(Font)              No change on input line 37.
+[5
+
+
+]
+Underfull \vbox (badness 10000) detected at line 58
+ []
+
+LaTeX Font Info:    Font shape `JT1/hgt/m/n' will be
+(Font)              scaled to size 9.24683pt on input line 67.
+LaTeX Font Info:    Font shape `JY1/hgt/m/n' will be
+(Font)              scaled to size 9.24683pt on input line 67.
+[6
+
+] (./Pepers.aux) ) 
 Here is how much of TeX's memory you used:
- 11410 strings out of 478724
- 177296 string characters out of 5858391
- 582368 words of memory out of 5000000
- 29719 multiletter control sequences out of 15000+600000
- 473991 words of font info for 50 fonts, out of 8000000 for 9000
+ 12148 strings out of 478724
+ 191130 string characters out of 5858391
+ 590368 words of memory out of 5000000
+ 30377 multiletter control sequences out of 15000+600000
+ 490218 words of font info for 129 fonts, out of 8000000 for 9000
  934 hyphenation exceptions out of 8191
- 75i,0n,79p,388b,1019s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,6n,79p,388b,1019s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-No pages of output.
+Output written on Pepers.dvi (6 pages, 8448 bytes).
