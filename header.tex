@@ -1,0 +1,111 @@
+\usepackage{amsmath}
+\usepackage{subfigure}
+\usepackage{overcite}
+\renewcommand{\subfigtopskip}{5pt}	% 図の上の隙間。上図の副題と下図の間。
+\renewcommand{\subfigbottomskip}{0pt} % 図の下の隙間。副題と本題の間。
+\renewcommand{\subfigcapskip}{-6pt}	% 図と副題の間
+\renewcommand{\subcapsize}{\scriptsize} % 副題の文字の大きさ
+
+%以下は式番号をsection(節)単位で付けてくれるものです 
+%例えば 1節の5番目の数式の場合は式1.5となります
+\numberwithin{equation}{section}
+\numberwithin{table}{section}
+\numberwithin{figure}{section}
+\usepackage{caption}
+\usepackage{listings}
+\usepackage{cases}%連立方程式とかの横の{を書くためのやつ。
+\usepackage{amsfonts}
+\usepackage{bm}%$\bm{アルファベット文字}$で太文字のベクトル表記ができます
+\usepackage{eee}
+\usepackage{url}%参考文献とかでurl使うときに。\url{https://～}
+\usepackage{here}%図があっちこっちいかないようにできる
+\usepackage{amsmath,amssymb}%数式関連
+%表関連
+\usepackage{subfigure}
+\usepackage{comment}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{subfig}
+\usepackage{paralist}
+\usepackage{pdfpages}
+\usepackage{titlesec}
+\usepackage[deluxe]{otf}
+\usepackage{wrapfig}
+\usepackage{lettrine}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{color}
+\setlength{\fboxrule}{1pt}
+\graphicspath{{./figs/}}
+
+\renewcommand{\subfigtopskip}{5pt}	% 図の上の隙間。上図の副題と下図の間。
+\renewcommand{\subfigbottomskip}{0pt} % 図の下の隙間。副題と本題の間。
+\renewcommand{\subfigcapskip}{-6pt}	% 図と副題の間
+\renewcommand{\subcapsize}{\scriptsize} % 副題の文字の大きさ
+
+% 節以下の見出しがゴシック体になってしまっていたので、
+% 太字明朝体になるように修正。
+\renewcommand{\headfont}{\bfseries}
+
+\makeatletter%% プリアンブルで再定義する際は必須
+
+\def\@makechapterhead#1{\hbox{}%
+  \vskip2\Cvs
+  {\parindent\z@
+%  \raggedright% 左揃え（オリジナルの定義)
+  \centering% 中央揃え
+%  \raggedleft% 右揃え
+  \normalfont\huge\sffamily\gtfamily%% フォントを変更する
+  \leavevmode
+  \ifnum \c@secnumdepth >\m@ne
+    \setlength\@tempdima{\linewidth}%
+%%%    \if@mainmatter% ← report クラスの場合この行不要
+%    \setbox\z@\hbox{\@chapapp\thechapter\@chappos\hskip1zw}%
+%    \addtolength\@tempdima{-\wd\z@}%
+%    \unhbox\z@\nobreak
+%%%    \fi% ← report クラスの場合この行不要
+    \vtop{\hsize\@tempdima\@chapapp\thechapter\@chappos\hskip1zw#1}%
+  \else
+    #1\relax
+  \fi}\nobreak\vskip3\Cvs}
+%
+\def\@makeschapterhead#1{\hbox{}%
+  \vskip2\Cvs
+  {\parindent\z@
+%  \raggedright% 左揃え（オリジナルの定義)
+  \centering% 中央揃え
+%  \raggedleft% 右揃え
+  \normalfont\huge\sffamily\gtfamily%% フォントを変更する
+  \leavevmode
+  \setlength\@tempdima{\linewidth}%
+  \vtop{\hsize\@tempdima#1}}\vskip3\Cvs}
+\makeatother%% プリアンブルで再定義する際は必須
+
+\makeatletter
+
+%%% 見出しの体裁カスタマイズ
+
+% 章見出しの体裁カスタマイズ
+% *なし
+\renewcommand{\@makechapterhead}[1]{% #1: 見出し
+    \vspace*{-2\baselineskip}%
+    \noindent\hrulefill\par%
+    \vtop to 5\baselineskip{% 5行分の高さを確保
+        \hspace*{\fill}\textbf{\large 第\thechapter 章}\par%
+        \hspace*{\fill}\textbf{\raisebox{-5pt}{\LARGE #1}}\par%
+    }%
+    \noindent\hrulefill\par}
+% *あり
+\renewcommand{\@makeschapterhead}[1]{% #1: 見出し
+    \vspace*{-2\baselineskip}%
+    \noindent\hrulefill\par%
+    \vtop to 5\baselineskip{% 5行分の高さを確保
+        \hspace*{\fill}\textbf{\raisebox{-5pt}{\LARGE #1}}\par%
+    }%
+    \noindent\hrulefill\par}
+
+\makeatother
+
+\renewcommand{\headfont}{\bfseries}
+

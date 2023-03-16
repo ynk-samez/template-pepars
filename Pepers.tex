@@ -1,0 +1,1758 @@
+%%: 図
+%\begin{figure}[H]
+%	\centering
+%	\includegraphics[width=90mm]{figure/eqc.eps}
+%	\caption{簡易等価回路}
+%	\label{fig:eqc}
+%\end{figure}
+\documentclass[10.5pt,a4j,dvipdfmx,openany]{jsbook}
+\input{header.tex}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage{wallpaper}
+\usepackage{listings,jvlisting} 
+\renewcommand{\figurename}{Fig. }
+\renewcommand{\tablename}{Tab. }
+\makeatletter
+\renewcommand{\ALG@name}{Algorithm.}
+\makeatother
+\title{\LARGE\fbox{令和4年度 卒業審査論文}\\\mbox{}\\
+  神経免疫相互作用に着想を得たマルチエージェントシステム型Neural-Networkの提案\\ \mbox{}\\
+\textit{Proposal of Neural-Network composed of multi-agent system inspired by neuroimmune interaction}}
+\author{柚木 開登}
+
+\begin{document}
+\maketitle
+\includepdf[pages=-]{title.pdf}
+% トップページを書く
+\tableofcontents
+\listoftables
+\listoffigures
+\clearpage
+\section*{あらまし}
+Large-scale neural network training requires abundant computational resources by nature, but today, thanks to the development of cloud computing, it has become possible to construct and train large-scale models at low cost, resulting in the widespread adoption of machine learning in various product development and services.
+
+However, such cloud-dependent machine learning inherently requires a large amount of learning data that can be reused for other product development, making it vulnerable to theft by malicious third parties or platform companies. Especially in recent years, as there is a demand for "personalized information," learning data often includes various personal information such as face photos, age, gender, beliefs, and hobbies, and the risk of leakage is significant.
+
+Furthermore, since the revelation of the massive surveillance program by the US National Security Agency (NSA) in 2013, countries around the world have strengthened regulations related to personal information protection, including the EU's General Data Protection Regulation (GDPR), with a focus on giant IT companies. The treatment of personal information in machine learning is facing a reform.
+
+Federated Learning (FL) is expected to solve the challenges described above. In FL, instead of aggregating learning data, each node that holds local learning data learns individually and constructs a large trained model by communicating and averaging the parameter differences obtained as a result with other nodes. This protects personal information within the nodes as privacy-included learning data is not transmitted.
+In order to put FL into practical use, it is necessary to deploy large-scale neural networks that were previously only available in data centers to computing environments with limited computing resources on the user side. Therefore, approaches in both "model lightweighting" and "effective use of computing resources within the environment" are important. While ideas such as pruning unnecessary synapses for the former and neural network distribution to multiple heterogeneous computing resources for the latter have been proposed, a model that combines both approaches has not been proposed.
+Therefore, in this study, we aim to construct a model that combines both model lightweighting and distribution by examining a neural network composed of multiple autonomous agents that consider neural immune interactions.
+
+\clearpage
+大規模なニューラルネットワークの学習には, 本来的に豊 富な計算資源を必要とするが, 今日では, クラウドコンピュー ティングの発展によって, 低いコストで大規模なモデルの構 築・学習が可能となっており, その結果として多様な製品開 発・サービスに機械学習の導入が広まっている.
+一方で, このようなクラウド依存な機械学習は, その性質上, 他の製品開発に流用可能性がある大量の学習データを集 約するため, 悪意の第三者, あるいはプラットフォーム企業そ のものによって盗取される可能性が否定できない. 特に近年 では「個人に最適化された情報」への需要から, 学習データにはあらゆる個人 情報が含まれることが多く, その流出リスクは大きい.
+さらに, 2013 年のアメリカ国家安全保障局 (NSA) による 大量監視プログラム発覚以降, EU の一般データ保護規則を はじめとして世界各国が巨大 IT 企業を意識した個人情報保 護に係る規制を強めており, 機械学習における個人情報の扱 いは変革が迫られている.
+上述した課題を解決すると期待されるのが, 連合学習 (Fed- erareted Learning; FL)である. 連合学習では, 学習デー タを集約するのではなく, ローカルな学習データを保有する 各ノードが, 個々に学習を行い, その結果得たパラメータ差分 を他のノードと通信し平均化することで大規模な学習済みモ デルを構築する. これによって, プライバシーを含んだ学習 データは通信されず個人情報がノード内に保護される.
+連合学習の実用化に際しては, 従来データセンターで学習 されていた大規模なニューラルネットワークを計算資源に乏 しい利用者側の計算機環境 (エッジ環境) に投入する必要が あるため, 「モデルの軽量化」及び「環境内計算資源の有効 利用」の両方面のアプローチが重要である. 前者に対しては, 不要なシナプスを除去する Pruning(剪定, 刈り込み), 後者に 対しては複数の不均一計算資源へのニューラルネットワーク の分散化といったアイデアが提案されているものの, 両アプ ローチを兼ね備えたモデルは提案されてこなかった.
+そこで本研究では, モデルの軽量化および分散化を兼ね備 えたモデルを構成することを目的に, 神経免疫相互作用を 考慮した複数の自律行動主体 (エージェント) で構成される ニューラルネットワークを検討を行う.
+
+\chapter{序論}
+\begin{comment}
+\section{概要}
+Neural-Networkによる大規模データセットを用いた機械学習は, 
+創薬, 自動運転, 金融に至るまで成果を残しており, 
+今後も期待される分野は多岐にわたる.
+しかし従来, 大規模な機械学習には大量のGPUと高性能なプロセッサを必要とするため, 
+導入は容易ではなかった.
+こうした課題を解消し, 機械学習の市場導入を支えてきたのが
+クラウドコンピューティングである.
+
+クラウドコンピューティングは処理をデータセンター上で実行し, 
+結果を利用者に提供することで
+計算機環境に付随する経済的・物理的な制約を解消した.
+また, その性質故に情報環境の迅速な整備を可能とし, 
+業務の効率化を実現させ情報社会を発展させた.
+このような公益的な側面の一方で, 
+クラウドコンピューティングは, 
+プラットフォーム企業による市場寡占,  
+データプライバシーに係る課題の顕在化,  
+企業--利用者間の情報の非対称性, 
+データセンターの消費電力の増大といった問題を生じさせた.
+適切な市場競争の回復, 情報の平等性, 省エネルギー社会の樹立, 
+データプライバシーの保護に向けて, 
+クラウドコンピューティングに代わる新しいコンピューティング
+アーキテクチャであるエッジコンピューティングの技術開発が進められている.
+従って, クラウドに依存してきた機械学習においても
+エッジコンピューティングへの対応が求められる.
+
+本章では, 国内の次世代型社会基盤と市場創出への期待, 
+及び国際的なプライバシー保護の機運の高まりに焦点をあて, 
+クラウドコンピューティング依存からの脱却に向けた
+国内•国際的な動きについて紹介し, 
+エッジコンピューティングにおける機械学習の将来に
+ついて述べる.
+  
+\end{comment}
+\section{社会的背景}
+\label{背景}
+%\lettrine[lines=2]%
+\subsection*{第五期科学技術基本計画実現に向けて}
+内閣府が提出した第五期科学技術基本計画\cite{第五期科学技術基本計画}において, 
+仮想空間と現実空間が高度に融合したデータ駆動社会, 所謂Society5.0が提唱された.
+Society5.0では, 
+これまで個別に機能していた生産, 流通, 教育, 医療, 金融等, 
+異分野のあらゆるシステムが仮想空間を通じて協調・統合することで, 
+多様な知識・技術の融合が行われる. 
+またこれにより, 産業構造の変革や技術革新を促し, 
+社会の至るところで新たな価値が創出することが期待される.
+このような持続的イノベーション創出基盤を確立することは, 
+今後の我が国の国際競争における優位性を確保し, ひいては経済成長の強力な足場となり得る.
+
+Society5.0の実現には, 
+現実空間の潜在情報をデータ化するセンシング, 
+安全性・信頼性が保証された通信プロトコル, 
+高速かつ大容量なネットワークといった
+情報の収集・蓄積・通信・解析に係る技術が基盤となる.
+
+翻って, 現在の我が国の電気・情報・通信分野の実情を俯瞰すると, 
+情報通信の最も基礎となる半導体加工技術及び精密部品製造については
+世界に伍する技術を持つ一方で, 
+ハードウェア以上の階層の行程, 
+すなわちソフトウェア, OS, 仮想化技術に至るまで
+大部分が外国製品に依存しており,  
+またそれらが既に市場を寡占しているため, 
+優れたサービスが開発されても, 市場圧力に負け撤退する状態が続いている.
+さらに, 我が国が強みとするハードウェア技術に関しても対応が迫られている.
+近年, アジアを中心に我が国からの技術・人材流出しており, 
+同市場における競争力の低下が指摘されている.
+また同時に, クラウド技術の発展により, 
+クライアント側のハードウェアに依存せずにパフォーマンスを
+提供することが可能になったことも受け, 
+ハードウェア市場の長期的な成長率は減少しつつある.
+ハードウェアを強みとする我が国において, 
+同市場の需要の喪失は計り知れない.
+
+こうした現状を無視して, 
+情報技術が基盤となるSociety5.0への転換を進めた場合, 
+従来持っていた市場を喪失するばかりか, 
+外国への(特にソフトウェア領域を中心とした)技術依存性を高め, 
+市場寡占を加速させ停滞した状況の打破がより難しくなる. 
+従って, Society5.0への移行に際しては, 
+単に転換を推進するだけでなく目下のIT市場の寡占状態を解消し,   
+適切な市場競争を回復することによって我が国のソフトウェア産業の振興を促すことが望ましい.
+\subsection*{データセンターとエネルギー問題と分散化}
+データセンターは, 電子メールやWebサイトのサーバー, 
+あるいはクラウドサービス用のストレージやクラスタ等の計算設備を集約設置する施設である.
+その規模は, 情報社会の広まりに伴って年々増加しており, 現代においてデータセンターはインフラストラクチャの
+バックボーンとしての位置を占める.
+
+一方で, データセンターはその性質故に絶え間なく大量のトラフィックを
+取り扱うため, 全世界の2％に及ぶ莫大な電力消費を行うことが知られており, 
+こうした課題に対する取り組みとして, 例えば冷却効率の改善がある.
+データセンターで消費される電力のうち
+30〜50％が計算設備を冷却するために
+用いられている. 
+拠って冷却効率を改善することで, データセンターの大幅な省エネルギー化の実現が期待できる.
+
+別のアプローチではエッジデータセンター等のエッジ分散によるトラフィックの抑制がある. 
+エッジデータセンターは, 
+データセンターを小規模化させ, 利用者に近い場所に設置することで
+トラフィックの集中を防ぎ, データの遅延を最小化させるという考えによる次世代のデータセンターである.
+従ってエッジデータセンターは, 従来のハイパースケールデータセンターと比較して, 
+取り扱うトラフィックが減少し機器からの発熱量も小さくなるため, 冷却に係る電力を
+少なく抑えることができる.
+
+いずれにせよ, エネルギー問題に直面しつつある我々人類にとって, 
+あらゆる機器の省エネルギー化は喫緊の課題であり, データセンターのあり方について変革が迫られている.
+\subsection*{巨大IT企業の台頭, 国家安全保障, プライバシー保護}
+2010年以降,  巨大IT企業が存在感を増している.
+特に, Google, Apple, Facebook(Meta), Amazon, Microsoftは
+俗にGAFAMと呼称され, その莫大な資本力故に市場を支配するだけにとどまらず, 
+それぞれが世界各国の政治・経済に多大な影響力を有するに至っている.
+
+GAFAMが数年の間に急速に成長し, 
+今なお強大な影響力を持つ要因はさまざまである.
+社会的要因を排除したひとつの視点は, 機械学習を中心としたユーザーデータの収集と解析である.
+彼らは, 登録されたアカウント情報やWebページの訪問履歴, 商品の購入履歴, 
+視聴した音楽, アシスタントAIへの質問, あるいはコンテンツの使用時刻等
+から性別・年齢・信条・健康状態・職業・収入・趣味嗜好を含めた大量のデータを収集・解析し, 
+市場需要の高い製品やサービスの開発に注力し, 生産性を向上させ競争に勝ってきた.
+
+ユーザーデータの収集は製品やサービスの改善として顧客に還元される一方で, 
+どこで, どのように, どこまで用いられるのかが見えにく, ユーザーデータ収集に対する懸念を呼び起こした.
+
+IT市場が規模を拡大するに従って, 個人情報を巡るさまざまな議論が行われたが, 
+しばらくの間, 規制当局は自由市場を確保しようとした.
+各国がプライバシー保護に関する規制を加速させたのは, 
+2013年に元アメリカ国家安全保障局(NSA)職員のEdward・J・Snowdenが行った内部告発の影響が大きい.
+Snowdenが告発した内容は, 
+「NSAが, 国内外のインターネット回線・電話回線を傍受し, アメリカの同盟国を含む世界中のあらゆる通信を監視・収集している」というものだった.
+この大量監視プログラムは, PRISMと称され,
+Google, Yahoo, Apple, FacebookといったIT企業が協力していた.
+
+Snowdenのリークは, 巨大IT企業への不信感とアメリカへの非難を生んだ.
+特に, EUは強い不快感を示し, 
+NSAのプライバシー侵害に対する
+非難決議を採択したほか 
+EU-US Privacy Shieldの制定や
+GDPR(General Data Protection Regulation)の議論の加速など
+プライバシー保護のための法整備を進めた\cite{GDPRsnowden}.
+
+とりわけ, GDPRは, 
+EUという巨大な経済圏に適用される規制として, 世界に対する影響力が大きく, 
+また, 後の国際的なプライバシー保護に関する動きの最初期に行われたものとして意義深い.
+
+以下, GDPRを中心とした主なプライバシー保護法とその制定年を列挙する(\wtab{個人情報保護}). 
+\begin{table}[H]
+  \centering
+  \caption{世界各国の個人情報保護規制}
+  \label{tab:個人情報保護}
+  \begin{tabular}{lll}
+    \toprule
+    適用年&規制&対象地域\\ \midrule
+    2018年&GDPR; General Data Privacy Regulation&欧州連合加盟国\\
+    2020年&CPRA; California Privacy Rights Act&アメリカ合衆国カリフォルニア州\\
+    2022年&PDPR; Personal Data Protection Regulation&タイ王国\\
+          &個人情報の保護に関する法律等の一部を改正する法律&日本\\
+    2023年&CCPA; California Consumer Privacy Act&アメリカ合衆国カリフォルニア州\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+以上のようなプライバシー保護の試みに関わらず,  
+機械学習, 換言してプライバシーデータ収集の恩恵を得てきた
+GAFAMら巨大IT企業はその莫大な資金力を持って規制を突破している現状があり\cite{GDPRの影響}, 
+IT市場の寡占状態に対する影響は限定的である.
+\clearpage
+\section{エッジコンピューティングへの期待}
+\subsection*{エッジコンピューティングが解決するクラウド社会の課題}
+先に述べたように, 社会はクラウド志向なサービスの利便性を享受する一方で, 
+プラットフォーマーによる市場寡占, データセンターでの電力消費増大, 
+そしてデータプライバシーの保護といった課題に直面している.
+
+クラウドの課題を克服する新しいアーキテクチャとして
+エッジコンピューティング(Edge Computing)が提唱されている.
+エッジコンピューティングでは, 
+データや処理をデータセンターに集約せずに
+利用者に物理的に近い計算機で完結するため, 
+負荷がネットワーク上に分散されるとともに, 通信の機会の最小化を図ることができる.
+また, 別の利点としてユーザーは環境内の計算資源を利用するため, 
+特定のプラットフォームへの依存から脱却することを可能とし, 
+市場構造の変革が促進され, 剰えその結果, 
+プロットフォーム企業による市場寡占が弱まり適切な市場競争が回復することが期待できる.
+\subsection*{遊休計算資源の利用とマルチエージェントシステム}
+エッジ環境では, 計算資源の制約がクラウドのそれと比較して厳しくなる.
+斯かれどエッジ環境内の計算資源はそのすべてが利用されていることは稀であり, 
+大多数が遊休状態に入っている.
+そこで, エッジ環境内の複数の遊休計算資源を利用して大規模な分散計算を行おうという試みがある.
+IoTデバイスやゲーム機などの遊休計算資源を分散計算に投入することができれば, 
+従来の設備を全く更新せずに, 大きな計算をエッジ環境内で完結することができるためである.
+しかしながら, ここで課題が生じる.
+ある一つのタスクを遊休計算資源に分散処理しようと考えるとき, これらは一般に異性能であるため,  
+計算資源を最大限活用した分散計算を行うには, 適切な大きさのサブタスクの分割と
+全体として計算資源の利用率が最大となるように配分しなければならない(\wfig{task}).
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=12cm]{task.pdf}
+  \caption{巨大なタスクをいくつかの小タスクに分割し, エッジ環境内の遊休計算資源に割り当てる.}
+  \label{fig:task}
+\end{figure}
+特に, 後者の「全体として計算資源の利用率が最大となるように配分する」ことは
+NP完全な組合せ最適化問題として知られるナップサック問題そのものであり, 
+解決するのは非常に難しい. 
+この分野における研究としては, 
+エージェント志向なシステムによるタスク分割最小化がある.
+
+システムをマルチエージェントシステムとして構成することで, 
+タスク分割の最小単位をエージェントとすることができる. 
+またエージェントの増加・減少が自由にできるため与えられた計算環境に自動適応するようなモデルも
+構築できる.
+\subsection*{エッジコンピューティングにおける機械学習手法}
+今日, 機械学習はあらゆる産業に投入され, それぞれにおいて多大な功績を残している.
+機械学習に期待される分野は多岐に渡り, 今後も機械学習の導入は広まると予測される. 
+エッジコンピューティングにおける機械学習として, 連合学習(Federareted-Learning:FL)が提案されている. 
+連合学習では, 学習を各エッジ環境で行い, その結果得たパラメータ差分のみを通信し, 平均化することで
+従来と同様な大規模なモデルを構築する.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=15cm]{federareted-learning.pdf}
+  \caption{協調型連合学習の概念図}
+\end{figure}
+連合学習ではプライバシーデータを含む学習データは各ノードに格納され, 
+通信しないため保護される.
+先に述べた国際的なデータプライバシー保護の機運の高まりから, 連合学習はエッジコンピューティング時代の
+機械学習手法のスタンダードとなっていくだろう.
+\section{本研究の目的}
+連合学習の実用化に際しては, 
+従来, データセンターで動いていたモデルを計算資源に乏しいエッジ環境に投入する必要があることから
+少なくとも以下2点の課題が考えられる.
+1つ目は学習パラメータ削減によるモデルの軽量化, 
+2つ目は, エッジ環境内の不均一計算資源の利用
+である.
+前者については刈り込みや, ニューラルアーキテクチャ探索, 後者についてはエージェント志向アーキテクチャによる
+分散処理システムや遊休計算資源を用いた大規模分散計算等があり, 
+今日までに多様な先行事例・研究が成されている. 
+両者を満たしたモデルを構築できれば, 
+大規模なNeural-Networkのエッジ環境への投入を可能にし, 
+かつ環境内の計算資源の利用率を最大化することが期待できるが,  
+両者を満たしたモデルに関する研究は著者の知る限り存在しない.
+
+そこで本研究では, 将来的に導入が期待されるエッジコンピューティングアーキテクチャにおける機械学習の
+実用化に向けて, 自律分散可能なNeural-Networkのパラメータ削減手法を提案する.
+提案にあたって, 生体の脳で行われる自律分散的なパラメータ削減であるグリア細胞による
+シナプスの刈り込みによる神経回路の醸成に着目し, 関係する細胞及び構造をNeuro-Agent, Synapse-Agent, 
+Glia-Agentという三種のエージェントとしてモデル化した. 
+これにより, システム全体がマルチエージェントシステムとして構成されるため, 自律分散性が保障される.
+\section{本論文の構成}
+本論文では神経免疫相互作用に着想を得たマルチエージェントシステム型ニューラルネットワークについての提案を行う.
+ 本論文の以下の構成は次のようになっている。
+ 第２章では、本論文の前提となる先行事例・研究を紹介する.
+ 第３章では、提案アルゴリズムに関連する生物学的背景を紹介する.
+ 第４章では、提案アルゴリズムを提案する.
+ 第5章では、計算機実験の結果及び考察をする.
+ 第6章では結論を述べる.
+ なお, 付録として本提案アルゴリズムの実装ソースコードを付してある.
+\chapter{関連研究}
+\section{Neural-Network}
+\subsection*{Neural-Networkの概要}
+Neural-Networkは機械学習のサブフィールドであり, 
+概念なレベルでは生体の神経回路の模倣として実装されている.
+Neural-Networkの多くは, 人工ニューロン(\wfig{人工ニューロン})と呼ばれる
+神経細胞の理論的モデルを用いたデータのフローを骨子としている.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=8cm]{2-neuron.pdf}
+  \caption{人工ニューロン}
+  \label{fig:人工ニューロン}
+\end{figure}
+説明の簡単のために, 
+ここでは\wfig{人工ニューロン}に示す人工ニューロンを用いて説明する.
+ニューロンの出力は以下のプロセスを得て決定される.
+\begin{enumerate}[STEP 1.]
+  \item 前段に接続されたニューロンの出力$x_1$, $x_2$, $x_3$に
+  シナプスの重み$w_1$, $w_2$, $w_3$が重み付けされる.
+  \item 重み付けされた入力と, ニューロンのバイアス$b$の総和が計算される.
+  \item STEP2.で計算された値を活性化関数$f$に入力され, その結果として$y$が出力される.
+\end{enumerate}
+拠って, 一般に$m$個の入力を持つニューロンの出力$y$は\weq{ニューロンの出力}で表される.
+\begin{align}
+  y=f(\,\displaystyle\sum_{i=0}^{m} x_iw_i+b\,)
+  \label{eq:ニューロンの出力}
+\end{align}
+ここで, 標準的な活性化関数$f$は, 実$n$次元数ベクトル空間から, 実$m$次元数ベクトル空間への
+写像である. つまり, 
+\begin{align}
+  f: \mathbb{R}^n\rightarrow\mathbb{R}^m
+\end{align}
+である.
+具体的にはシグモイド関数(\weq{シグモイド}), 
+ステップ関数(\weq{ステップ}), 
+ReLU関数(\weq{ReLU})等が利用されている.
+\begin{align}
+  f(x)=\displaystyle \cfrac{1}{1+e^{-x}}=\cfrac{\tanh(x/2)+1}{2}
+  \label{eq:シグモイド}
+\end{align}
+\begin{align}
+  f(x-b)=
+  \displaystyle
+  \begin{cases}
+    1 \hspace{1cm}if. \hspace{0.5cm}x\geq b\\
+    0\hspace{1cm}otherwise. \hspace{0.5cm}x\leq b
+  \end{cases}
+  \label{eq:ステップ}
+\end{align}
+\begin{align}
+f(x)=
+\displaystyle
+\begin{cases}
+  x \hspace{1cm}if. \hspace{0.5cm}x\geq 0\\
+  0\hspace{1cm}otherwise. \hspace{0.5cm}x\leq 0
+\end{cases}
+\label{eq:ReLU}
+\end{align}
+
+人口ニューロン同士を結合し, ネットワーク上にすることでNeural-Networkの
+表現能力は増大していく(万能近似定理). 
+\subsection*{誤差逆伝播法}
+通常, ニューラルネットワークの学習は\wfig{2-NNtrain}に示すように
+ニューラルネットワークに期待する入出力関係を満たすデータのペアを用いて行われる.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=12cm]{2-NNtrain.pdf}
+  \caption{Neural-Networkにおける学習を表した図.}
+  \label{fig:2-NNtrain}
+\end{figure}
+このとき, 期待する入出力関係を完全に満たす何らかのモデルを表す写像$g$とすると, 
+ニューラルネットワークの内部状態$f$との誤差$\varepsilon$は, 学習を行うにつれて小さくなる.
+\begin{align}
+ \displaystyle\lim_{t\rightarrow \infty}\displaystyle\varepsilon(t)=\|f(\bm{X})-g(\bm{X})\|=0
+\end{align}
+ここで, 入力空間$\bm{X}$は学習データを示す.
+この理論的保証は, ニューラルネットワークの万能近似定理(Universal Approximation Theorem)に依って与えられる.
+万能近似定理は, 有界な連続関数を所望の精度で近似するニューラルネットワークが必ず存在することを主張している.
+
+
+標準的なNeural-Networkの学習には誤差逆伝播法で行われる.
+誤差逆伝播法は, Neural-Networkの出力層で生じた誤差に対して, 
+ネットワーク中のあるニューロン$N_i$におけるシナプスの重み$w_i$及び各バイアス$b_i$が持つ責任の大きさに応じて
+パラメータを更新していく手法である.
+拠って, $w_i$, $b_i$の更新は誤差$E$に対する自身の偏微分を用いて
+\begin{align}
+  w_i\leftarrow\eta\cfrac{\partial E}{\partial w_i}
+\end{align}
+\begin{align}
+  b_i\leftarrow\eta\cfrac{\partial E}{\partial b_i}
+\end{align}
+で表現される.
+ここで, $\eta$は学習率と呼ばれるパラメータであり, 
+更新量のスケーリングを司どる.
+\section{ニューラルアーキテクチャ探索}
+ニューラルアーキテクチャ探索の実用化以前, 大規模なニューラルネットワークの設計は, 人間の専門知識や経験に基づいて行われてきた.
+しかしそもそもニューラルネットワークの学習に最適な構造は, タスク, データセット,
+制約されるコスト, 所望の精度, その他あらゆるパラメータ
+に拠って異なり, 従来手法では, 
+複雑な関係性を持つ多数のパラメータや制約を考慮することが困難であり
+最適な構造を見つけることができない場合があった.
+ニューラルアーキテクチャ探索(Neural-Architecture Search\,;\,NAS )は, 
+ニューラルネットワークの設計プロセスを自動化し, 膨大な可能性のあるニューラルネットワーク構造の中から
+見つけて, 高度な機械学習モデルの設計プロセスの短縮を可能にしようという試みである.
+NASは現在までに従来法を上回る成果を残しており, 
+例えば, NASによって設計された NASnet と呼ばれる
+オブジェクト検出用ニューラルネットワークはこれまでのモデルの性能を上回る精度を持つに至っている.
+\section{Pruning}
+Pruningはニューラルネットワークのパラメータ削減手法として最もメジャーなものの一つであり, 
+直感的かつ実装が容易で, 多くの派生アルゴリズムが提案されている.
+Pruningは刈り込みや剪定と訳されるように, ニューラルネットワーク中の重みが0に近い
+(つまり, 結果に寄与しない)シナプスの重みを完全に$0$し, 最終的に学習に必要な重みを持ったシナプスのみで構成される
+スパースニューラルネットワークを作成するものである.
+Pruningを冗長なニューラルネットワークに施すことで, 重み更新に係る処理を短縮し, 
+従来よりも高速な学習が可能になる.
+\clearpage
+\section{マルチエージェントシステム}
+本節では, マルチエージェントシステムについての
+初歩的な理論を述べるに留め, 数学的な定義・説明・解釈には立ち入らず, 詳しい説明は
+参考文献\cite{マルチエージェントシステムの基礎と応用}に譲る.
+\subsection*{エージェントの定義}
+これまで, 工学的なシステムは要素還元主義的に設計されてきた.
+一方で, IoTの広まりや, 電源多様化, スマートグリッドといった需要から
+あらゆる「システム」がネットワークに接続され大規模・複雑化している. 
+この課題解決として, 
+存在論的還元主義に基づいたマルチエージェントシステムが関心を集めている.
+マルチエージェントシステムはエージェントと呼ばれる
+自律行動主体によって決定されるシステムであり, エージェント同士が通信を
+行うことで全体的なシステムを構成する.
+
+ここで, マルチエージェントシステムにおけるエージェントとは, 
+「環境(environment)の状態を認識し, 
+それによって自身の行動を決定し, 
+環境に対して影響を与えることができる自立行動主体」として定義される.
+また, 環境とは「エージェントの外部にあって, エージェントの意思によって
+変更できない全て」を指す.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=12cm]{agent.pdf}
+  \caption{エージェントの定義}
+\end{figure}
+
+環境の状態の集合を$S=\{s_0, s_1, s_2, \cdots\}$, 
+エージェントのとる行動の集合を$A=\{a_0, a_1, a_2, \cdots\}$とすると, 
+環境の変化を表す関数$env$は以下で表される.
+\begin{align}
+  env: S^{*}\times A\rightarrow P(S)
+\end{align} 
+ここで, $P(S)$は$S$の冪集合である.
+すなわち, 環境はエージェントの行動$a_i\in A, i=\{0, 1, 2, \cdots\}$と
+環境の履歴で定まる.
+また, 定義からエージェントの行動は
+環境の状態の知覚によって定める必要がある.
+すなわち, エージェントの行動関数$action$は以下のようになる.
+\begin{align}
+  action: P^{*}\rightarrow A
+  \label{eq:action1}
+\end{align}
+\weq{action1}は無数にある
+環境の状態一つ一つに対して, 行動を割り当てる必要があることを示している.
+一般に, エージェントは有限の記憶領域しか持たないため実装は不可能である.
+そこで, エージェントの内部状態と知覚から次にとる行動を決定するものとする.
+エージェントの内部状態を, 内部状態と知覚から新しい内部状態に書き換える関数$next$を考える. 
+エージェントの内部状態の集合を$I=\{i_0, i_1, i_2, \cdots\}$とすると, 
+$next$は, \weq{next}として表さられる.
+\begin{align}
+  next: I\times P \rightarrow I
+  \label{eq:next}
+\end{align}
+これによって, 行動関数は以下のように書き換えられる.
+\begin{align}
+  action: I\rightarrow A
+\end{align}
+\subsection*{代数的グラフ理論}
+エージェントの相互作用はグラフ(graph)を用いて表される(\wfig{graph}).
+ここで, グラフとはいくつかの頂点と辺を持つ図形のことを指す.
+グラフ理論においては, 
+頂点と辺をそれぞれノード(node)とエッジ(edge)と呼ぶ.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=10cm]{graph.pdf}
+  \caption{グラフの幾何学的病像, グラフ上の辺をエッジ, 頂点をノードと呼ぶ}
+  \label{fig:graph}
+\end{figure}
+また, グラフ$\mathcal{G}$は, 
+ノードの集合$\mathcal{V}=\{1, 2, 3, \cdots, n\}$と, 
+エッジの集合$\mathcal{E}\subseteq \mathcal{V}\times\mathcal{V}$
+を用いて, \weq{def.graph}として定義される.
+\begin{align}
+  \mathcal{G}=(\,\mathcal{V},\,\mathcal{E}\,)
+  \label{eq:def.graph}
+\end{align}
+例えば, \wfig{graph}に示したグラフでは, 頂点集合と辺集合は
+\begin{align}
+  \mathcal{V}=\{1, 2, 3, 4, 5, 6\}
+\end{align}
+\begin{align}
+  \mathcal{E}=\{(1, 2),(1, 4), (2, 3), (2, 5), (3, 4), (3, 6), (4, 1), (4, 2),(6, 5)\}
+\end{align}
+となる. 
+また, $(i, j)\subseteq \mathcal{E}$に対して, $(j, i)\subseteq \mathcal{E}$が成り立つ
+とき, $\mathcal{G}$を無向グラフ(undirected graph)といい, 
+成り立たない場合, $\mathcal{G}$は有向グラフ(directed graph)であるという.
+従って, \wfig{graph}は有向グラフである.
+
+有向グラフは行列を用いて特徴付けられる.
+\subsubsection*{隣接行列: Adjacency matrix}
+隣接行列(adjacency matrix)は, グラフの任意のノードが隣接しているか否かを示す行列である.
+ここで, $i \in\mathcal{V}$と$j \in\mathcal{V}$
+が隣接する(adjacent)とは, 頂点$i$から$j$への辺が存在することであり, 
+従って,隣接する状態を$1$, 隣接しない状態を$0$とすると, 
+隣接行列$A=[a_{ij}]\in \mathbb{R}^{n\times n}$の要素は, 
+\begin{align}
+  a_{ij}=
+  \begin{cases}
+    1, \hspace*{1cm}if\hspace*{0.5cm}(i, j)\subseteq \mathcal{E}\hspace*{0.2cm}and\hspace*{0.2cm}i \neq j.\\
+    0, \hspace*{1cm}otherwise.
+  \end{cases}
+\end{align}
+を満たす.
+\wfig{graph}の例の場合, 隣接行列$A$は\weq{graph.adj}となる.
+
+\begin{align}
+  A=
+  \begin{pmatrix}
+    0&1&0&1&0&0\\
+    0&0&1&0&1&0\\
+    0&0&0&1&0&1\\
+    1&1&0&0&0&0\\
+    0&0&0&0&0&0\\
+    0&0&0&0&1&0\\
+  \end{pmatrix}  
+  \label{eq:graph.adj}
+\end{align}
+\subsubsection*{次数行列: Degree matrix}
+ノードの次数(degree)とは, ノードに接続されたエッジの本数である.
+さらにノードに入力されたエッジ数を入次数, ノードから出力されるエッジ数を出次数と呼び, 
+例えば, ノード$i\in \mathcal{V}$についての入次数及び出次数は$d_i^{in}$,$d_i^{out}$のように表す.
+次数行列は入次数を用いて, \weq{def_degree}として定義される.
+\begin{align}
+  D:=diag(d_1^{in}, d_2^{in}, d_3^{in},\cdots d_n^{in})
+  \label{eq:def_degree}
+\end{align}
+\wfig{graph}のグラフの次数行列は以下のようになる.
+\begin{align}
+  D=diag(1, 2, 2, 2, 0, 1)=
+  \begin{pmatrix}
+    \displaystyle d_1^{in}&0&0&0&0&0\\
+    0&\displaystyle d_2^{in}&0&0&0&0\\
+    0&0&\displaystyle d_3^{in}&0&0&0\\
+    0&0&0&\displaystyle d_4^{in}&0&0\\
+    0&0&0&0&\displaystyle d_5^{in}&0\\
+    0&0&0&0&0&\displaystyle d_6^{in}\\
+  \end{pmatrix}= 
+  \begin{pmatrix}
+    1&0&0&0&0&0\\
+    0& 2&0&0&0&0\\
+    0&0& 2&0&0&0\\
+    0&0&0& 2&0&0\\
+    0&0&0&0& 0&0\\
+    0&0&0&0&0& 1\\
+  \end{pmatrix}   
+\end{align}
+\subsubsection*{グラフラプラシアン: Graph Laplacian}
+グラフラプラシアン$L \in \mathbb{R}^{2\times 2}$
+はグラフ上の各エッジの勾配を意味する行列であり, 隣接行列$A$及び, 次数行列$D$を用いて, 
+以下で定義される.
+\begin{align}
+  L:=D-A
+\end{align}
+また, 別の表現として
+\begin{align}
+  L=
+  \begin{pmatrix}
+    \displaystyle\sum_{j=1}^n a_{1j}&\displaystyle -a_{12}&\displaystyle -a_{13}&\cdots&\displaystyle -a_{1n}\\
+    \displaystyle -a_{21}&\displaystyle\sum_{j=2}^n a_{2j}&-a_{23}&\cdots&\displaystyle -a_{2n}\\
+    \displaystyle -a_{31}&-a_{32}&\displaystyle\sum_{j=3}^n a_{3j}&\cdots&\displaystyle -a_{3n}\\
+    \vdots&\vdots&\ddots&\ddots&\displaystyle -a_{(n-1)n}\\
+    \displaystyle -a_{n1}&-a_{n2}&\cdots&-a_{n(n-1)}&\displaystyle\sum_{j=2}^n a_{nj}
+  \end{pmatrix} 
+\end{align}
+とも表すことができる.
+\wfig{graph}のグラフラプラシアンは以下のようになる.
+\begin{align}
+  L=D-A=
+  \begin{pmatrix}
+    1&0&0&0&0&0\\
+    0& 2&0&0&0&0\\
+    0&0& 2&0&0&0\\
+    0&0&0& 2&0&0\\
+    0&0&0&0& 0&0\\
+    0&0&0&0&0& 1\\
+  \end{pmatrix}  
+  -
+  \begin{pmatrix}
+    0&1&0&1&0&0\\
+    0&0&1&0&1&0\\
+    0&0&0&1&0&1\\
+    1&1&0&0&0&0\\
+    0&0&0&0&0&0\\
+    0&0&0&0&1&0\\
+  \end{pmatrix} 
+  =
+  \begin{pmatrix}
+    1&-1&0&-1&0&0\\
+    0& 2&-1&0&-1&0\\
+    0&0& 2&-1&0&-1\\
+    -1&-1&0& 2&0&0\\
+    0&0&0&0& 0&0\\
+    0&0&0&0&-1& 1\\
+  \end{pmatrix}  
+\end{align}
+\chapter{生物学的背景}
+\section{グリア細胞}
+脳は100億以上の神経細胞とその10倍以上のグリア細胞(Glia Cells)によって構成される.
+例えば, 神経細胞周辺は\wfig{GliaCell}に示すように, 多数のグリア細胞が密集している.
+\begin{figure}[H]
+\centering
+\includegraphics[width=12cm]{GliaCell.jpg}
+\caption{グリア細胞と神経細胞の構成\cite{GliaCell}}  
+\label{GliaCell}
+\end{figure}
+従来, グリア細胞の役割は神経細胞にエネルギー供給を行い, 物理的な位置の固定であると
+思われてきたが, 近年になって脳の情報処理の根幹に関わる多様な役割を持つことが明らかになった.
+以下に, 現在までに知られる中枢神経系グリア細胞のと, その機能についてまとめる.
+\begin{description}
+  \item[ミクログリア; microglia] 
+  ミクログリアは脳内免疫細胞であり, 常在性マクロファージの一種である.
+  神経細胞の物理的支持, 及び死滅細胞の除去を担う.
+  \item[アストロサイト; astrocyte]
+  アストロサイトは中枢神経系で最も多く見られるグリア細胞で
+  神経細胞と血管の間にあるブラッドブレインバリアを形成し, 
+  脳内の化学物質や細胞の流入を制限する働きを行う.
+  また, 脳内の物質交換, 神経再生, 損傷修復の司令塔となる.
+  \item[オリゴデンドロサイト; oligodendrocyte]   
+  オリゴデンドロサイトは主に神経細胞の軸索を被覆するミエリン鞘を形成する.
+  ミエリン鞘は神経伝達の速度をコントロールする働きがある物質で, 
+  オリゴデンドロサイトは, ミエリン鞘を介して, 神経回路の形成に関わる.
+\end{description}
+\section{神経免疫相互作用}
+従来, 神経系と免疫系は独立した系であると捉えられてきたが, 近年になって, これらが
+密接に相互作用し人体の恒常性を維持していることが知られるようになった.
+この神経系--免疫系の相互作用を神経目ね気相互作用(Neuroimunne interaction)と呼び, 
+例えば, 神経系から免疫系への作用に免疫系のストレス反応がある. 
+神経系が環境認識の結果ストレスを感じると, 神経細胞は神経伝達物質を放出する.
+免疫系はこれらの受容体を持つので, 結果的に神経系からの作用によって, 
+免疫系が活性化したり抑制されたりといった反応を示すことになる.
+
+逆に, 免疫系から神経系への作用の例としては神経免疫疾患がわかりやすい.
+神経免疫疾患とは, 免疫系が神経系の細胞を破壊することで, 神経系が正常に動作しなくなる疾患であり, 
+多発性硬化症, 
+視神経脊髄炎, 
+重症筋無力症, 
+ギラン・バレー症候群, 
+慢性炎症性脱髄性多発神経炎, 
+多発筋炎,
+サルコイドーシスなど多様な症状を見せる.
+
+神経免疫相互作用は, 脳機能発達にも深く関与している.
+
+霊長類の大脳皮質においては, 生後直後からシナプス数が
+急速に増大し小児期に最大値に達したのち刈り込みが行われ
+減少していくオーバーシュート型シナプス形成が行われるが, 
+このシナプス形成の実行者は脳内免疫細胞で中枢神経系グリア細胞の一種であるミクログリアである.
+つまり, 神経回路醸成は免疫系から神経系への作用と見ることができる.
+
+なお, このシナプス形成の刈り込み段階において統合失調症では刈り込みが通常よりも多く行われ, 
+ASDでは刈り込みが通常よりも少なく行われることが確認されており, 
+シナプスの刈り込みが脳の高次機能維持・発現の要因である可能性が示唆されている.
+\section{グリアアセンブリ}
+イメージング技術の発達により, 
+先に示したミクログリア, オリゴデンドロサイト, アストロサイト等の種々のグリア細胞は,
+独立に機能しているのではなくグリアアセンブリ(Glia-Assembly)と呼ばれるグリア細胞同士の
+ネットワーク(\wfig{GliaAssembly})を形成していることが判明した.\cite{GliaAssembly}
+
+グリアアセンブリは, 脳全体に渡って広がり神経系とは独立して機能する.
+また, シナプスの刈り込みとグリアアセンブリの形成時期は重なることから, 
+グリアアセンブリは, 単に相互のネットワークを持つだけでなく,
+よりマクロに見れば神経回路とグリアアセンブリの2つのネットワークの相互作用が伺える.
+\begin{figure}[H]
+\centering
+\includegraphics[width=12cm]{GliaAssembly.jpg}
+\caption{グリアアセンブリのイメージング及び, 神経回路との比較\cite{GliaAssembly}}  
+\end{figure}
+\chapter{提案アルゴリズム}
+\section{複数のエージェントによって構成されるNeural-Network}
+本提案モデルの基盤である`` 複数のエージェントによって構成される
+Neural-Network(Agent Based Neural-Network; ABNN) ''
+はエージェントベースのアプローチをNeural-Networkに統合したものである.
+通常のNeural-Networkは、入力と出力を処理する単一モデルであるのに対して, 
+ABNNは表面的な役割は従来のNeural-Networkと等価であるものの, 
+複数のニューロンやシナプスに対応した各エージェントにより構成される
+マルチエージェントシステムである点に違いがある.
+
+また, ABNNはNeural-Networkをマルチエージェントシステムとして
+構成したことで標準的なNeural-Networkの持つ表現能力に加えて, 
+自己組織化能力, 柔軟性, 分散処理性を持つ.
+
+以下, システムに投入する各エージェントについて説明する.
+\begin{description}
+  \item[Neuro-Agent]神経細胞をモデル化したエージェントであり, 情報の受容, 処理, 
+  転送などを担当する.
+  それぞれのNeuro-Agentは, 情報を受け取るための複数の入力$x_i$ $\;(i= 1, 2, 3, \cdots m)$を持ち, 
+  これを処理して別のNeuro-Agentに情報を送信するための出力$y$を生成する.
+  この時の内部処理は, 通常の人口ニューロンと同等である(\weq{Neuro-Agent}).
+  \begin{align}
+    y=f(\sum_{i=1}^m x_i+b)
+    \label{eq:Neuro-Agent}
+  \end{align}
+  なお, 本研究で使用した活性化関数$f$は$\theta:=\displaystyle\sum_{i=1}^m x_i+b$として, 
+  \begin{align}
+    f(\theta):=\displaystyle\frac{1}{1+\exp(-\theta)}
+  \end{align}
+  で表すシグモイダルな関数である.
+  \item[Synapse-Agent]シナプスをモデル化したエージェントであり, 
+  Neuro-Agent間の情報の伝達を担当する.
+  それぞれのSynapse-Agentは, 1つの入力$u$を受け取り, それを変換した値$v$を出力する. 
+  この出力は別のNeuro-Agentの入力として使用される.
+  \begin{align}
+    x_i=weight\cdot y
+ \label{eq:Synapse-Agent}   
+  \end{align}
+  ここで, \weq{Synapse-Agent}中の$weight$は, シナプスの重みを示し, これとNeuro-Agentの内部変数$b$を
+  誤差逆伝播を用いて更新していくことでシステム全体の学習が行われる.
+  \item[Glia-Agent] 神経細胞の補助細胞であるグリア細胞(Glia-Cell), 特に
+  microgliaによる免疫的役割を中心にoligodendrocyte, astrocyteの機能も含めた
+  中枢神経系グリア細胞の機能を抽出したエージェントである.
+  Glia-Agentは, Neuro-AgentとSynapse-Agentによって構成されるニューラルネットワークに対して,
+  自身の内部変数$sig$を閾値に用いたシナプスの刈り込みを行う.
+\end{description}
+\clearpage
+\section{神経免疫相互作用に基づくNeuro--Glia相互調節機構}
+Neural-Netoworkのシナプス削減を自動的に調節するため, 
+神経免疫相互作用に基づくNeuro-AgentとGlia-Agent間の相互作用
+である``\,Neuro-Glia相互調節機構\,''を提案する.
+
+Neuro-Glia相互調節機構は\wfig{NeuroGlia}に示すように
+Glia-Agentの内部変数$sig$を用いた刈り込みの実行と$sig$の操作に拠って行われる.
+\begin{figure}[H]
+\centering
+\includegraphics[width=15cm]{NewDeal-crop.pdf}  
+\caption{Neuro-Glia相互調節機構}
+\label{fig:NeuroGlia}
+\end{figure}
+以下, 具体的にGlia-AgentからNeuro-Agentへの作用と
+Neuro-AgentからGlia-Agentへの作用に分けて詳説する.
+\subsection*{Glia-AgentからNeuro-Agentへの作用\,:\,Synapseの刈り込み}
+Glia-Agentは, 自身の内部変数$sig$を用いて確率的に刈り込み命令を発出する.
+以下の\walg{tis}は, Glia-Agentのシナプスの刈り込みの過程を疑似コードで示したものである.
+\begin{algorithm}[H]
+\caption{Glia-AgentからNeuro-Agentへの作用\,\,:\,\,シナプスの刈り込み指令}
+\label{alg:tis}
+\begin{algorithmic}[1]
+
+\Function {pruning\_synapse}{\,$\text{Neuro}$}
+    \State $r \gets random(0,1)$
+      \If{$r\geq \text{Glia}.sig$} 
+       \State $target\_id\gets$find(min(Synapse.$weight$)) from Neuro.$fromlist$
+       \State remove $target\_id$ from Neuro.$fromlist$
+       \State remove Synapse($target\_id$)
+      \EndIf
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+\subsection*{Neuro-AgentからGlia-Agentへの作用\,:\,フィードバック}
+  次に, Neuro-AgentからGlia-Agentへのフィードバックによる$sig$の調節について述べる.
+  Neuro-Agentはまず, 以下の手順でバッチサイズ分だけ自身の活動回数をカウントし, 活動頻度を計算する.
+\begin{enumerate}[STEP 1.]
+  \item $\mod(\text{データを流した回数},バッチサイズ)=0$でカウント用変数$cnt$を初期値$0$で用意する.
+  \item 自身及び, 自身の隣接するNeuro-Agentの出力値集合$\mathcal{N}$を求める.
+  \item $\mathcal{N}$に対してSminov-Grubbsの棄却検定を行い, 自身が外れ値であるならばカウント用変数$cnt$に$1$を加算する. そうでないなら何も加算しない.
+  \item STEP 2〜3をバッチサイズ分だけ繰り返す.
+  \item 自身の活動頻度$freq$を以下の式で求める. 
+  \begin{align}
+      freq=\displaystyle\frac{cnt}{バッチサイズ}
+  \end{align}
+\end{enumerate}
+このようにして求められたNeuro-Agentの活動頻度$freq$は以下のフィードバック関数で, 
+対応するGlia-Agentの内部変数$sig$の調節する.
+本論文ではフィードバック関数,及び各調整パラメータ($\alpha, \beta$)は\weq{feed}, 
+\weq{feed_param1}, \weq{feed_param2}で設定した.
+
+\begin{align}
+  sig\leftarrow sig-\alpha\left[\frac{2}{1-\beta\exp(freq-0.01)}-1\right]
+  \label{eq:feed}
+\end{align}
+\begin{align}
+  \alpha=0.01  
+  \label{eq:feed_param1}
+\end{align}
+\begin{align}
+  \beta=6\ln(3)
+  \label{eq:feed_param2}
+\end{align}
+以上の処理を擬似コードで示したものが\walg{tis2}である.
+\begin{algorithm}[H]
+  \caption{Neuro-AgentからGlia-Agentへの作用\,\,:\,\,sigの調節}
+  \label{alg:tis2}
+  \begin{algorithmic}[1]
+  
+  \Function {feedback}{\,$\text{Glia}$}
+        \If{$\mod(times, BatchSize)$==0}
+        \If{$times\neq 0$}
+        \State $freq\gets cnt/BatchSize$
+
+        \State $Glia.sig\gets Glia.sig-\displaystyle\alpha\left[\frac{2}{1-\beta\exp(freq-0.01)}-1\right]$
+        \EndIf
+        \State $cnt\gets 0$
+        \EndIf
+         \If{isoutliner$(\mathcal{N},"\text{sminov-grubbs}")$==Me}
+          \State cnt+=1
+          \Else
+          \State cnt+=0 
+         \EndIf 
+  \EndFunction
+  \end{algorithmic}
+  \end{algorithm}
+\section{グリアネットワークの導入}
+刈り込みを実行したGlia-Agentは$sig=1.0$に更新することで次回の刈り込みを抑制することができる.
+しかし, これでは隣接する$Glia-Agent$の状態とは無関係に刈り込みが行われることになり, 
+最悪の場合, 局所的な刈り込みが起こりネットワークが破綻する可能性が考えられる.
+そこで, 本研究ではグリアアセンブリを模倣したGlia-Agent同士のネットワークである
+グリアネットワークを定義し, 
+時空間的に隣接した刈り込みを抑制する機構を導入している.
+具体的に, グリアネットワークでは, あるGlia-Agentが刈り込み指令を発出した際に, 
+自身の$sig$を他のGlia-Agentに減衰伝播させることで実現させている.
+$sig$の減衰はグリアネットワーク上の伝播距離(ホップ数)に応じて減衰率$A$だけ行われる.
+なお, 単一のGAに複数の距離が与えられた場合, 最も伝播距離の短いGAの影響を優先する.
+例えば, \wfig{GliaNetworks}の$G_4$は 
+$G_1\rightarrow G_2\rightarrow G_3\rightarrow G_4$と$G_k\rightarrow G_4$の経路を持つが, 
+この場合, 後者の経路のみを考えることになる.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=15cm]{GliaNetworks.pdf}
+  \caption{$A=0.01$の場合でのグリアネットワークでの$sig$の伝播のあり方}
+  \label{fig:GliaNetworks}
+\end{figure}
+依って一般に, $sig_{G_i}\,,\,(i=1,2,\cdots m)$を入力にもつグリアの内部変数$sig_G$の更新値は
+\weq{tt}で表現できる.
+\begin{align}
+  sig_{G}=\min(sig_{G_i})-A
+  \label{eq:tt}
+\end{align}
+\chapter{計算機実験}
+\section{前実験:マルチエージェントシステム型Neural-Network}
+前実験として\wfig{Struct}に示すネットワークを用いて
+マルチエージェントシステム型Neural-Networkの学習率$\eta$を変化させ単純なタスクを学習させた.
+学習内容は以下の通りである.
+\begin{center}
+  \textbf{ニューラルネットワークの入力上位3bitのいずれかに1が入っているならば1をそうでないならば0を出力せよ.}  
+\end{center} 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=15cm]{StructureNetwork-crop.pdf}
+  \caption{ネットワーク構造}
+  \label{fig:Struct}
+\end{figure}
+いずれも実験に用いた各パラメータは\wtab{Pre-Pram}に示す通りである.
+\begin{table}[H]
+  \caption{前実験におけるパラメータ一覧}
+  \label{tab:Pre-Pram}
+  \centering
+   \begin{tabular}{ll}
+    \toprule
+      パラメータ&値\\\midrule\midrule
+      学習率$\eta$&$0.05,\,\, 0.1,\,\,0.5$\\
+      エポック数$Epocs$&$200\,100,\,20$\\
+      ミニバッチサイズ$miniBatchSize$&$100,\,50,\,10$\\
+      初期ニューロン数$Neurons$&$31$\\
+      初期グリア数$Glias$&$31$\\
+      初期シナプス数$Mill$&$182$\\
+      減衰率$A$&0.01\\
+      入力サイズ$Inputs$&$6$\\
+      出力サイズ$Outputs$&$1$\\
+    \bottomrule
+   \end{tabular}
+ \end{table}
+\wfig{Pre-LearningCurve}は, 学習率$eta$を$0.05$, $0.1$, $0.5$と変化させた際の
+学習曲線である.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=15cm]{Pre-LearningCurve-crop.pdf}
+    \caption{前実験:学習曲線}
+    \label{fig:Pre-LearningCurve}
+\end{figure}
+\wfig{Pre-Learning}より, マルチエージェントシステム型ニューラルネットワークは
+学習率$\eta$
+適切に学習を行うことができていると評価できる.
+\clearpage
+\section{提案モデルの検証}
+提案モデルの検証のため, \wfig{Before}に示すニューラルネットワークを用いて, 
+同一パラメータ条件下で比較実験を行った.
+\wfig{Before}中のシナプスの色は赤に近いほど正の重みを持ち, 
+水色に近いほど負の重みを持つ.
+また, それぞれの太さは重みの絶対値に対応している.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=15cm]{GIFMAKER/Scene_2.png}
+  \caption{対象とするニューラルネットワーク(学習前)}
+  \label{fig:Before}
+\end{figure}
+学習タスクは以下の通りである.
+\begin{center}
+  \textbf{ニューラルネットワークの入力上位3bitのいずれかに1が入っているならば1をそうでないならば0を出力せよ.}  
+\end{center} 
+
+なお, これら実験で比較する対象は以下の通りである.
+\begin{enumerate}[対象アルゴリズム1. ]
+  \item Neuro-Agent及びGlia-Agentから構成されるNeural-Network.
+  \item 上記に加えてGlia-Agentを投入し, Neuro-Glia相互調節機構を組み込んだもの.
+  \item 上記に加えてGlia-Agent同士の相互作用(Glia-Network)を組み込んだもの.
+\end{enumerate}
+いずれも, \wtab{Pram}に示す条件の下で行った. 
+\begin{table}[H]
+  \caption{提案モデル検証におけるパラメータ一覧}
+  \label{tab:Pram}
+  \centering
+   \begin{tabular}{lll}
+    \toprule
+    \multicolumn{1}{c}{パラメータ}&\multicolumn{1}{c}{値}&\multicolumn{1}{c}{備考}\\\midrule\midrule
+      学習率$\eta$&$0.5$&\\
+      エポック数$Epocs$&$100$&\\
+      ミニバッチサイズ$miniBatchSize$&$100$&\\
+      初期ニューロン数$Neurons$&$31$&\\
+      初期グリア数$Glias$&$31$&\\
+      初期シナプス数$Mill$&$182$&\\
+      減衰率$A$&0.01&対象アルゴリズム1.及び2についてはこのパラメータは用いない.\\
+      入力サイズ$Inputs$&$6$&\\
+      出力サイズ$Outputs$&$1$&\\
+    \bottomrule
+   \end{tabular}
+ \end{table}
+ 実験によって得られた結果を\wfig{Curve}及び\wfig{CalcGraph}に示す.
+ \wfig{CalcGraph}は, 刈り込みを行った後の最終的なグラフ構造を示している.
+ このグラフにおいて, シナプスの重みが色に対応し, 重みの絶対値が太さに対応している.
+ また, \wfig{Curve}上図は, Neural-Network単体, Neural-NetworkにGlia-Agentを投入したモデル,
+そして本提案のNeural-NetworkにGlia-Agentと導入し, かつGlia-Agent同士の相互作用であるグリアネットワークを導入したものの
+シナプスの時間変化を示した曲線であり, 同下図は, それぞれの学習曲線を示したものである.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=15cm]{GIFMAKER/Scene_101.png}  
+  \caption{刈り込み後のネットワーク}
+  \label{fig:CalcGraph}
+ \end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=15cm]{Da-crop.pdf}
+  \caption{シナプスの削減曲線と学習曲線}
+  \label{fig:Curve}
+\end{figure}
+結果からわかるように約 $Epoc = 40$ までにシナプスが刈り込まれ減少し, その後一定 数に収束していることがわかる. これらのシナプス数の減少 は指数関数的であり, 霊長類の脳に見られるオーバーシュー ト型シナプス形成の同様の傾向を示していた. 具体的には、 初期の結合のシナプス数 $182$ が, 最終的に $72$ まで減少し, 約 $60\%$ のシナプスが削減された.
+また, 最終結果のネットワーク(\wfig{CalcGraph})では, 
+刈り込みがネットワーク全体に分散的に行われている様子が伺える. 以上のことから、提案システムにより、学習精度を維持したままモデルの削減が行えることが確認できたと評価できる.
+\chapter{結論}
+将来的に導入が期待されるエッジコンピューティングアーキテクチャにおける機械学習の
+実用化に向けて, 自律分散的に刈り込みを行うマルチエージェントシステムで構成されるニューラルネットワークを提案した.
+本提案におけるニューラルネットワークの刈り込み手法によって, 精度を維持したまま
+60％のシナプスの削減
+が実現された.
+今後の課題としては, グリアネットワークそのものの構造依存性の調査や, 
+実際の不均一計算資源環境での分散化, あるいは
+ニューラルネットワークのサブフィールドである
+深層学習の分野への応用に向けて, 畳み込み処理を
+マルチエージェントベースで構築することが挙げられる.
+\chapter{謝辞}
+本論文執筆にあたり, 指導教官の山本哲也教授には私の我儘なテーマ設定に対しても
+真摯に向き合っていただきました. 
+また同じ部屋で研究を共にした櫻井歩くん, 針金屋光くんにも数々の指導・助言を賜わりました. 
+この場を借りて感謝申し上げます.
+
+また, 阿部晃大准教授, 岡島由以子准教授, 川崎憲広准教授にはそれぞれに
+諸所の場面で数々の
+ご迷惑とご心配をお掛けしたことをお詫びするとともに, これまでの支援に感謝申し上げます.
+
+\begin{thebibliography}{9}
+%参考文献の書式。
+%書籍：　      著者,書名[,シリーズ名],出版社[,出版地],発行年[,ページ].
+%論文：　      筆者,表題,雑誌名{,巻号},発行年月{,ページ}.
+%学会発表：　  筆者,表題,会議名{,セッション名},開催年月日.
+%新聞記事：　  {筆者,}見出し,紙名[（夕刊　],年月日[,ページ].
+%Web ページ：　{著者,}表題{,シリーズ名},サイト名,掲載社{, 作成日}, 閲覧日, URL
+%個人的対話：　話者[,状況記述],年月日.
+\bibitem{cloud_market}
+総務省, 情報通信分野の現状と課題, \url{https://www.soumu.go.jp/johotsusintokei/whitepaper/ja/r04/html/nd236800.html}, 閲覧日:令和5年1月21日
+\bibitem{MemberShip}
+Shokri, Reza, et al. "Membership inference attacks against machine learning models." 2017 IEEE symposium on security and privacy (SP). IEEE, 2017.
+\bibitem{第五期科学技術基本計画}
+内閣府, 第五期科学技術基本計画, \url{https://www8.cao.go.jp/cstp/kihonkeikaku/5honbun.pdf},平成28年1月22日
+\bibitem{Beyond5G}
+五十嵐大和. ``Beyond5G 推進戦略 6G へのロードマップ.'' IEICE Conferences Archives. The Institute of Electronics, Information and Communication Engineers, 2020. 
+\bibitem{BigTech}
+Bremmer, Ian. "The Technopolar Moment: How Digital Powers Will Reshape the Global Order." Foreign Aff. 100 (2021): 112.
+\bibitem{PRISM}
+宮下紘. "個人情報保護とサイバー・セキュリティ: デジタル時代の双子." 比較法雑誌 49.4 (2016): 81-93.
+\bibitem{GDPRsnowden}
+Coyne, Hallie. "The untold story of Edward Snowden’s impact on the GDPR." The Cyber Defense Review 4.2 (2019): 65-80.
+\bibitem{民主主義と自律分散}
+原田泉. "米中新冷戦期の DX 推進と我が国独自のネットワーキング社会の実現." 危機管理研究 29 (2021): 1-14.
+\bibitem{マルチエージェントシステムの基礎と応用}
+大内 東, 山本雅人, 川村秀憲, "マルチエージェントシステムの基礎と応用 -- 複雑系工学の計算パラダイム --", コロナ社, 2003年
+\bibitem{GDPRの影響}
+野村総合研究所, プライバシーガバナンスの時代 ―法改正とGAFA規制に向けたプライバシー投資のあり方― \url{https://www.nri.com/-/media/Corporate/jp/Files/PDF/knowledge/report/cc/mediaforum/2022/forum338.pdf?la=ja-JP&hash=3C2C0B83004EFDBBC63F4650EE36D6F92B18966C}
+\bibitem{GliaCell}
+Types of Glia, lumen, Biology for Majors II,
+\url{\url{https://courses.lumenlearning.com/wm-biology2/chapter/glial-cells/}}
+\bibitem{GliaAssembly}
+文部科学省, 新学術領域研究「グリアアセンブリによる脳機能発現の制御と病態」,\url{http://square.umin.ac.jp/glialassembl/research/index.html#con02}
+\end{thebibliography}
+\chapter{付録}
+\begin{lstlisting}[caption=main.m]
+  %clc;
+  rng(21);
+  const;
+  neuron=agent.empty(Neurons,0);
+  glia=subagent.empty(Glias,0);
+  
+  synapse=edge.empty(Synapses,0);
+  gliacomp=subedge.empty(GliaComp,0);
+  
+  hst=zeros(Steps/miniBatchSize+1,1);
+  numSyna=zeros(Steps/miniBatchSize+1,1);%シナプスの数
+  numSyna(1)=Synapses;
+  
+  global hm;
+  hm=Synapses;
+  %=================================実体化========================
+   for i=1:Neurons
+     neuron(i)=agent(i);
+   end
+  
+  for i=1:Synapses
+     synapse(i)=edge(i);
+   end
+  
+  for i=1:Glias
+      glia(i)=subagent(i,neuron(i));
+  end
+  
+  for i=1:GliaComp
+      gliacomp(i)=subedge(i);
+  end
+  
+  input("--[ 学習開始 ]--");
+  %================================計算=================================
+  
+  %カオティックにつなぐ
+  
+  % for s=1:Synapses
+  %     synapse(s).joint(neuron(a),neuron(b));
+  %     gliacomp(s).joint(glia(a),glia(b));
+  % end
+  % 
+  
+  %====ニューラルネットワークの定義
+  s=1;
+  %     for i=1:6 
+  %         for j=7:11
+  %             synapse(s).joint(neuron(i),neuron(j));
+  %             s=s+1;
+  %         end   
+  %     end
+  % 
+  %     for i=7:11 
+  %         for j=12:15
+  %         synapse(s).joint(neuron(i),neuron(j));
+  %           s=s+1;
+  %         end   
+  %     end
+  % 
+  % 
+  %     for i=12:15 
+  %         for j=16:18
+  %        synapse(s).joint(neuron(i),neuron(j));
+  %           s=s+1;
+  %         end   
+  %     end
+  % 
+  % 
+  %     for i=16:18 
+  %         for j=19:20
+  %           synapse(s).joint(neuron(i),neuron(j));
+  %                s=s+1;
+  %         end   
+  %     end
+  %     
+  %     for i=19:20
+  %         for j=21:21
+  %        synapse(s).joint(neuron(i),neuron(j));
+  %             s=s+1;
+  %         end   
+  %     end
+  % 
+  % %====グリアネットワークの定義
+  % s=1;
+  %     for i=1:6 
+  %         for j=7:11
+  %             gliacomp(s).joint(glia(i),glia(j));
+  %             s=s+1;
+  %         end   
+  %     end
+  % 
+  %     for i=7:11 
+  %         for j=12:15
+  %         gliacomp(s).joint(glia(i),glia(j));
+  %           s=s+1;
+  %         end   
+  %     end
+  % 
+  % 
+  %     for i=12:15 
+  %         for j=16:18
+  %        gliacomp(s).joint(glia(i),glia(j));
+  %           s=s+1;
+  %         end   
+  %     end
+  % 
+  % 
+  %     for i=16:18 
+  %         for j=19:20
+  %           gliacomp(s).joint(glia(i),glia(j));
+  %                s=s+1;
+  %         end   
+  %     end
+  %     
+  %     for i=19:20
+  %         for j=21:21
+  %        gliacomp(s).joint(glia(i),glia(j));
+  %             s=s+1;
+  %         end   
+  %     end
+  
+  
+  %============================================
+  
+  %=6(1->2)
+     for i=1:6 
+          for j=7:14
+              synapse(s).joint(neuron(i),neuron(j));
+              s=s+1;
+          end   
+      end
+  %=8(2->3)
+      for i=7:14 
+          for j=15:22
+          synapse(s).joint(neuron(i),neuron(j));
+            s=s+1;
+          end   
+      end
+  
+  %=8(3->4)
+      for i=15:22 
+          for j=23:30
+         synapse(s).joint(neuron(i),neuron(j));
+            s=s+1;
+          end   
+      end
+  
+  %=1 
+      for i=23:30
+          for j=31:31
+         synapse(s).joint(neuron(i),neuron(j));
+              s=s+1;
+          end   
+      end
+  
+  %====グリアネットワークの定義
+  s=1;
+  %=6
+      for i=1:6 
+          for j=7:14
+              gliacomp(s).joint(glia(i),glia(j));
+              s=s+1;
+          end   
+      end
+  %=8
+      for i=7:14 
+          for j=15:22
+          gliacomp(s).joint(glia(i),glia(j));
+            s=s+1;
+          end   
+      end
+  
+  %=8
+      for i=15:22 
+          for j=23:30
+         gliacomp(s).joint(glia(i),glia(j));
+            s=s+1;
+          end   
+      end
+  
+  %=1
+      for i=23:30 
+          for j=31:31
+            gliacomp(s).joint(glia(i),glia(j));
+                 s=s+1;
+          end   
+      end
+  
+  
+  for k=1:Neurons
+      if k==Neurons
+          neuron(k).layer="output";
+      elseif k<=6
+          neuron(k).layer="input";
+      else
+          neuron(k).layer="middle";
+      end
+  end
+  
+  
+  
+  for i=1:Steps%学習開始
+  
+  for k=1:Neurons
+      neuron(k).x=[];
+      %clear neuron(k).x;
+  end
+  
+  %datagenerate
+  %neuron(1).x=randi(0:1);
+  %neuron(2).x=randi(0:1);
+  %neuron(3).x=randi(0:1);
+  %neuron(4).x=randi(0:1);
+  %neuron(5).x=randi(0:1);
+  %neuron(6).x=randi(0:1);
+  
+  neuron(1).x=rand; 
+  neuron(2).x=rand; 
+  neuron(3).x=rand;
+  neuron(4).x=rand;
+  neuron(5).x=rand;
+  neuron(6).x=rand;
+  
+  if neuron(5).x>0.1%(neuron(6).x+neuron(5).x+neuron(4).x)>0
+      crt=1;
+  else
+      crt=0;
+  end
+  
+  %情報の伝達
+  for k=1:6
+      neuron(k).activ();
+  end
+  
+  
+  for k=1:Neurons
+      neuron(k).flow(synapse,neuron);
+      neuron(k).activ();
+  end
+  
+  
+  
+  if i==1
+     error=neuron(Neurons).y-crt;
+     hst(1)=abs(error);
+      disp("epoc "+1+"  [正答率]:"+(1-abs(error))*100+"%");
+  end
+  
+  
+  
+  if mod(i,miniBatchSize)==0
+  %if l>=10
+  
+  if l<=1
+     for k=1:Neurons
+         neuron(k).actf=neuron(k).actf/miniBatchSize;
+     end
+      for k=7:Glias-1
+          glia(k).strat(synapse,neuron,glia,gliacomp);
+      end
+      for k=1:Synapses
+         synapse(k).removeCheck(neuron);
+      end
+      for k=1:Neurons
+          neuron(k).dead_or_alive();
+          if neuron(k).status=="dead"
+              clear neuron(k)
+          end
+      end
+      for k=1:Synapses
+          if synapse(k).status=="remove"
+              clear synapse(k)
+          end
+      end
+  end
+  
+  for k=6:Neurons-1
+      disp(neuron(k).actf+" --->  "+0.01*(2/(1+exp( k*(neuron(k).actf-0.2) ) )-1)+"---->"+glia(k).sig);
+  end
+  
+      numSyna(l)=hm;
+  
+          error=error/miniBatchSize;
+          hst(l)=abs(error);
+          disp("epoc  "+l+"  [正答率]:"+(1-abs(error))*100+"%");
+  
+      for k=Synapses:-1:1
+       synapse(k).update(eta,neuron,synapse,error);
+      end
+  
+  
+      for k=1:Neurons
+         neuron(k).actf=0;
+      end
+  
+  
+  cnts=0;
+  tmp=hm;
+  for k=1:Synapses
+      if synapse(k).status=="remove"
+          cnts=cnts+1;
+      end
+  end         
+  
+  hm=Synapses-cnts;
+      disp("--> "+tmp+" --> "+hm);
+      %=======画像生成・保存=========
+      %printGraph(l,synapse,Adj);
+          l=l+1;
+  else
+       for k=1:Neurons
+           neuron(k).feedBack(neuron);
+       end
+      error=error+neuron(Neurons).y-crt;
+  end
+  end%学習終わり
+  
+  j=1;
+  
+  %hold on;
+  
+  clear Weights;
+  for k=1:Synapses
+      if synapse(k).status=="joint"
+          Weights(j)=synapse(k).weight;
+          j=j+1;
+      end
+  end
+  
+  figure(2)
+      Widths=rescale(abs(Weights),1,100);
+      Adj=createAdjMatrix(synapse,Adj);
+      G = digraph(Adj);
+      G.Edges.Weight=Widths'.*Widths';
+      G.Edges.Weight=7*G.Edges.Weight/max(G.Edges.Weight);
+      LWidths = G.Edges.Weight;
+      
+      h=plot(G,'XData',XD','YData',YD','LineWidth',LWidths,'EdgeCData',Weights');
+      colorbar;
+      
+      
+  %layout(h,'layered','Direction','right','Sources',[1,2,3,4,5,6])
+  
+  
+   figure('Name','Glia-Network')
+   Adj=createAdjMatrix(gliacomp,Adj);
+   G = digraph(Adj);
+   h=plot(G);
+   layout(h,'layered','Direction','right')
+  
+  
+  subplot(2,1,1)%,'Name','Synapse-Number')
+  X=0:Steps/miniBatchSize;
+      plot(X,numSyna,'-','LineWidth',0.5)
+      grid on;
+      ylim([0 Synapses]);
+      xlabel('Epoc');
+      ylabel('the number of Synapses');
+      hold on;
+  subplot(2,1,2)
+  X=0:Steps/miniBatchSize;
+      plot(X,hst,'-o')
+      grid on;
+      grid minor
+      xlabel("Epoc");
+      ylabel("Error");
+      ylim([0 1])
+      hold on;  
+\end{lstlisting}
+\begin{lstlisting}[caption=agent.m]
+  classdef agent  < handle
+    properties
+        id;
+        y;
+        dy;
+        x;
+        bias;
+        dedb;
+        totalX;
+        totalBias;
+        layer;
+        temp;
+        fromlist;%シナプス
+        tolist;%シナプス
+        cnt=0;
+        actf;
+        status;
+    end
+ methods
+     function obj=agent(num)
+         const;
+        obj.dedb=0;
+        obj.bias=0.1*rand()-0.1;%0.1*normrnd(0,1);
+
+        obj.id=num;
+        obj.actf=0;
+        obj.status="alive";
+     end
+     function obj=activ(obj)
+         if isempty(obj.x)==false
+             obj.totalX=sum(obj.x);
+             obj.totalBias=sum(obj.bias);
+             obj.y=sigmoids(obj.totalX+obj.totalBias);
+             obj.dy=dsigmoids(obj.y);
+         end
+     end
+
+     function obj=flow(obj,edge,agent)
+         for k=1:numel(obj.fromlist)
+                w=edge(obj.fromlist(k)).weight;
+                sid=edge(obj.fromlist(k)).from_id;
+             if edge(obj.fromlist(k)).status=="joint"
+                obj.x=[obj.x w*agent(sid).y];
+             end
+         end
+     end
+
+     function obj=dead_or_alive(obj)
+      if isempty(obj.fromlist)==true&&isempty(obj.tolist)==true
+        obj.status="dead";
+      end
+        
+     end
+
+     function obj=feedBack(obj,agent)
+               oon=zeros(1+numel(obj.fromlist)+numel(obj.tolist),1);
+               oon(1)=obj.y;
+               for k=2:numel(obj.fromlist)
+                    oon(k)=agent(k).y;
+               end
+               for n=k:numel(obj.tolist)+k
+                    oon(n)=agent(n).y;
+               end
+               if numel(oon)>4
+               A=isoutlier(oon,"median");
+               clear oon;
+               if A(1)==1
+                   obj.actf=obj.actf+1;
+               end
+               clear A;
+               else 
+                   obj.actf=obj.actf+1;
+               end
+     end
+ end
+end
+\end{lstlisting}
+\begin{lstlisting}[caption=edge.m]
+  #include<stdio.h>
+  int main(){
+     printf("Hello world!");
+  }
+\end{lstlisting}
+\begin{lstlisting}[caption=subagent.m]
+  classdef subagent < handle
+  properties
+      id;
+      agentId;%agent id
+      sig;%signal input 
+      layer;%input.or.output
+      fromlist;%edge
+      tolist;%edge
+  end
+  methods
+      function obj=subagent(num,agent)
+          obj.id=num;
+          obj.layer="ok";
+          obj.sig=0.5;
+          obj.agentId=agent.id;
+
+          if obj.id<7||obj.id==31
+              obj.layer="ng";
+          end
+      end
+     
+      %agent(id).remodel(edge,agent)
+      function [obj,edge,agent]=strat(obj,edge,agent,subagent,subedge)%刈り込み
+         const;
+         tac=obj.sig;
+         if rand()>tac
+               Sef=zeros(numel(agent(obj.agentId).fromlist),1);
+                for k=1:numel(agent(obj.agentId).fromlist)
+                     tid=agent(obj.agentId).fromlist(k);
+                    Sef(k)=edge(tid).weight;
+                end
+              inpos=knnsearch(Sef,0);
+              clear Sef;
+              pos=agent(obj.agentId).fromlist(inpos);
+            if isempty(pos)==false
+              if edge(pos).status=="joint"
+                  edge(pos).remove(agent);
+              end
+               obj.sig=1.0;
+              obj.trans(subagent,subedge);
+               obj.recoil(agent);
+            end
+         end
+      end
+    
+      function obj=recoil(obj,agent)
+        const;
+          %指数関数
+          %
+          %obj.sig=obj.sig-agent(obj.agentId).actf; %132まで行く
+        
+          %if strcmp(agent(obj.agentId).status,'dead')==false
+              %obj.sig=obj.sig-0.01*exp(-20*agent(obj.agentId).actf);
+          %end
+          %obj.sig=obj.sig-0.001*exp(-15*agent(obj.agentId).actf);
+          %f agent(obj.agentId).status=="alive"
+              %disp(obj.sig)
+          %end
+          k=6*log(3);
+          obj.sig=obj.sig-(2/(1+exp( k*(agent(obj.agentId).actf-0.1) ) )-1);
+          %obj.sig=obj.sig-0.01*(-2*agent(obj.agentId).actf+1);
+          %obj.sig=obj.sig-exp(-5*agent(obj.agentId).actf)+1;%うまく行く
+          %obj.sig=obj.sig+k*a^c^agent(obj.agentId).actf;
+          %obj.sig=obj.sig+Attn*(0.7^exp(-3*agent(obj.agentId).actf+4));
+      end
+
+      function  [obj,subagent]=trans(obj,subagent,subedge)%信号伝達
+          %ネットワーク中の信号の伝播を実現するために再起的処理を行います。
+          %メモリ使用量が大きいので一部コメントアウトします。
+            Attn=0.3;
+                for i=1:numel(obj.tolist)%総覧右側
+                    tid=subedge(obj.tolist(i)).to_id;
+                    if strcmp(subagent(tid).layer,"ok")==true
+                        if  subagent(tid).sig<=obj.sig-Attn
+                              subagent(tid).sig=obj.sig-Attn;
+                        end
+                        subagent(tid).trans(subagent,subedge);
+                    end
+                end
+                 clear tid;
+%{
+              for i=1:numel(obj.fromlist)%総覧左側
+                  tid=subedge(obj.fromlist(i)).from_id;
+                  if strcmp(subagent(tid).layer,"ok")==true
+                      subagent(tid).sig=obj.sig-Attn;
+                      if subagent(tid).sig>=obj.sig-Attn
+                          subagent(tid).sig=((obj.sig-Attn)+subagent(tid).sig)/2;
+                      end
+                      subagent(tid).trans(subagent,subedge);
+                  end
+             end  
+             clear tid;
+%}
+
+      end
+
+  end
+end
+\end{lstlisting}
+\begin{lstlisting}[caption=subedge.m]
+  classdef subedge <handle
+  properties
+      from_id;
+      to_id;
+      id;
+      status;
+  end
+  methods
+      function obj=subedge(num)
+          obj.id=num;
+          obj.status="connect";
+      end
+    function [obj,subagent1,subagent2]=joint(obj,subagent1,subagent2)
+          obj.from_id=subagent1.id;
+          obj.to_id=subagent2.id;
+
+          if isempty(subagent1.tolist)==false %空ではない
+              subagent1.tolist(end+1)=obj.id;
+          else
+              subagent1.tolist=obj.id;    
+          end
+
+          if isempty(subagent2.fromlist)==false
+              subagent2.fromlist(end+1)=obj.id;  
+          else
+              subagent2.fromlist=obj.id;      
+          end
+    end
+      
+
+  end
+
+end
+\end{lstlisting}
+\begin{lstlisting}[caption=const.m]
+  eta=0.1;
+  Neurons=31;
+  Glias=31;
+  Synapses=184;
+  GliaComp=184;
+  Attn=0.01;%減衰率
+  b=10;
+  error=0;
+  l=2;
+  miniBatchSize=2;
+  Steps=1000*miniBatchSize;
+  
+  Adj=zeros(Neurons,Neurons);
+  
+  XD=[ 
+       1
+       1
+       1
+       1
+       1
+       1
+       2
+       2
+       2
+       2
+       2
+       2
+       2
+       2
+       3
+       3
+       3
+       3
+       3
+       3
+       3
+       3
+       4
+       4
+       4
+       4
+       4
+       4
+       4
+       4
+       5
+       ];
+  
+  YD=[
+   2.0000
+      3.0000
+      4.0000
+      5.0000
+      6.0000
+      7.0000
+      1.0000
+      2.0000
+      3.0000
+      4.0000
+      5.0000
+      6.0000
+      7.0000
+      8.0000
+      1.0000
+      2.0000
+      3.0000
+      4.0000
+      5.0000
+      6.0000
+      7.0000
+      8.0000
+      1.0000
+      2.0000
+      3.0000
+      4.0000
+      5.0000
+      6.0000
+      7.0000
+      8.0000
+      4.5000
+      ];
+  
+  %Adj=gpuArray(zeros(Neurons,Neurons));
+  %定数ファイル
+\end{lstlisting}
+\begin{lstlisting}[caption=createAdjMatrix.m]
+  function Adj=createAdjMatrix(edge,Adj)
+const;  
+    for i=1:Synapses
+        if strcmp(edge(i).status,"remove")==false
+            Adj(edge(i).from_id,edge(i).to_id)=1;
+        end
+   end
+end
+\end{lstlisting}
+\begin{lstlisting}[caption=sigmoids.m]
+  function y=sigmoids(x)
+    y=1/(1+exp(-x));
+  end
+\end{lstlisting}
+\begin{lstlisting}[caption=makegraph.m]
+  const;
+  neuron=agent.empty(Neurons,0);
+  synapse=edge.empty(Synapses,0);
+  
+   for i=1:Neurons
+     neuron(i)=agent(i);
+   end
+  
+  for i=1:Synapses
+     synapse(i)=edge(i);
+   end
+  %=6(1->2)
+  s=1;
+     for i=1:6 
+          for j=7:14
+              synapse(s).joint(neuron(i),neuron(j));
+              s=s+1;
+          end   
+      end
+  %=8(2->3)
+      for i=7:14 
+          for j=15:22
+          synapse(s).joint(neuron(i),neuron(j));
+            s=s+1;
+          end   
+      end
+  
+  %=8(3->4)
+      for i=15:22 
+          for j=23:30
+         synapse(s).joint(neuron(i),neuron(j));
+            s=s+1;
+          end   
+      end
+  
+  %=1 
+      for i=23:30
+          for j=31:31
+         synapse(s).joint(neuron(i),neuron(j));
+              s=s+1;
+          end   
+      end
+  
+  figure(5)
+   Adj=createAdjMatrix(synapse,Adj);
+   G = digraph(Adj);
+   h=plot(G,'XData',XD','YData',YD');   
+\end{lstlisting}
+\end{document}
+
+
+
+
